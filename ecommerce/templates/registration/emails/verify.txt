@@ -1,0 +1,11 @@
+Hello,
+
+Please activate your account form {{ email }} by clicking the link bellow
+
+{{ path }}
+
+Once you activate, you can login!
+
+Thank you,
+
+Python eCommerce

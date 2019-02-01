@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+<!-- este es el formulario con el que se registran los nuevos usuarios que existen -->
+
+{% block content %}
+<h1>Register</h1>
+<form method='POST'>
+  {% csrf_token %}
+  {{ form }}
+  <button type='submit' class='btn-default'>Submit</button>
+</form>
+{% endblock %}

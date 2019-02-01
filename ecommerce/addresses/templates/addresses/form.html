@@ -1,0 +1,15 @@
+<!-- este es el formulario en el que las personas incluyen su dirección. Es incluído desde checkout.html -->
+<form method='POST' action='{% if action_url %}{{ action_url }}{% else %}{% url "login" %}{% endif %}'>
+  <!-- action, es el campo en un formulaio, que indica a donde redireccionar una vez que se hace submit con el formulario. En este caso, la información de action,
+  viene dada desde el template checkout.html que pasa información a este template.-->
+
+    {% csrf_token %}
+    {% if next_url %}
+    <input type="hidden" name="next" value="{{ next_url }}">
+    {% endif %}
+    {% if address_type %}
+    <input type="hidden" name="address_type" value="{{ address_type }}">
+    {% endif %}
+  {{ form.as_p }}
+  <button type='submit' class='btn-default'>Submit</button>
+</form>

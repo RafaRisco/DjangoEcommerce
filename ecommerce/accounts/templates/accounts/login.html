@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+<!-- este es el se logean los usuarios, a través de la página login, no de la página checkout  -->
+
+
+{% block content %}
+<h1>Log in</h1>
+<form method='POST'> {% csrf_token %}
+  {{ form }}
+  <button type='submit' class='btn-default'>Submit</button>
+</form>
+{% endblock %}

@@ -1,0 +1,44 @@
+<!-- este es el template que muestra el formulario, con las direcciones guardadas, por si el usuario las quiere usar
+Este formulario, está insertado dentro de checkout.html, de donde toma la información.-->
+
+<!-- verificamos que la dirección existe -->
+{% if address_qs.exists %}
+  <form method='POST' action={{ action_url }}> {% csrf_token %}
+    <!-- esto nos permite definir que action_url hay que llamar, esto viene indicado por el template checkout.html que indica cual es la action_url. En este caso,
+    porque así lo indica checkout.html, la url es la que tiene el nombre checkout_address_reuse, y llamar a la view checkout_address_reuse.En checkout.html se indica que
+     esa es la url que se llama, en action_url.-->
+
+  {% if next_url %}
+    <input type="hidden" name="next" value="{{ next_url }}">
+    <!-- esto nos permite recoger información que pasa el template checkout.html, y pasarla a la view, en este caso checkout_address_reuse_view, que es la view que es
+    llamada desde la url con el nombre checkout_address_reuse. En checkout.html se indica que esa es la url que se llama, en action_url. En este caso,
+    con el nombre de next, tomamos la información del campo next_url. Esta información, será pasada a la vista correspondiente, en este caso checkout_address_reuse_view,
+    dentro de addresses/views.py-->
+  {% endif %}
+
+  {% if address_type %}
+    <input type="hidden" name="address_type" value="{{ address_type }}">
+    <!-- esto nos permite recoger información que pasa el template checkout.html, y pasarla a la view, en este caso checkout_address_reuse_view, que es la view que es
+    llamada desde la url con el nombre checkout_address_reuse. En checkout.html se indica que esa es la url que se llama, en action_url. En este caso,
+    con el nombre de address_type, tomamos la información del campo address_type. Esta información, será pasada a la vista correspondiente, en este caso checkout_address_reuse_view,
+    dentro de addresses/views.py-->
+  {% endif %}
+
+  {% for address in address_qs %}
+  <!-- hacemos un loop para mostrar las diferentes direcciones guardadas, y la información de cada dirección. address_qs proviene de checkout.html -->
+    <label for='address-{{ address.id }}'>
+      <!-- esta es la etiqueta de la address correspondiente. address.id proviene de checkout.html (de address_qs) -->
+      <input id='address-{{ address.id }}' type='radio' name='shipping_address' value={{ address.id }}/>
+      <!-- esto nos permite recoger información que pasa el template checkout.html, y pasarla a la view, en este caso checkout_address_reuse_view, que es la view que es
+      llamada desde la url con el nombre checkout_address_reuse. En checkout.html se indica que esa es la url que se llama, en action_url. En este caso,
+      con el nombre de shipping_address, tomamos la información del campo address.id. También pasamos la informaci´no de la address.id, con el nombre de id.
+      Esta información, será pasada a la vista correspondiente, en este caso checkout_address_reuse_view, dentro de addresses/views.py
+      Adicionalmente, al ser un formulario en el que elegimos una opción, se usa type='radio'-->
+    {{ address.address_line_1 }}
+    <!-- esta es la información (line_1) que se muestra -->
+    </label><br/>
+  {% endfor %}
+  <button type="submit" class='btn btn-success'>Use address</button>
+  <!-- este es el botón para seleccionar la dirección -->
+  </form>
+{% endif %}

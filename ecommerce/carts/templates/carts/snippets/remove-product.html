@@ -1,0 +1,11 @@
+<form class='form-product-ajax' method='POST' action='{% url "cart:update" %}' data-endpoint='{% url "cart:update" %}' class="form"> {% csrf_token %}
+<!-- este formulario da la opcion de eliminar un producto en concreto. Este formulario se inserta en el template carts/home. La información del formulario es enviada
+a la vista cart_update, así está definido en action. La class form-product-ajax, sirve para identificar este elemento e incluir Jquery, para hacer que el formulario
+responda de forma asincrónica. -->
+
+  <input class='cart-item-product-id' type='hidden' name='product_id' value='{{ product_id }}' />
+  <!-- la class cart-item-product-id, la creamos para identificar este elemento e incluir ajax. Esta información se pasa a la view cart_update y se pasa la información de
+  product_id, con el nombre de product_id. La información de product_id llega a este template, desde el template en el que está inserto, cart/home.html-->
+
+    <button type='submit' class='btn btn-link btn-sm' style="padding:0px;cursor:pointer">Remove?</button>
+</form>

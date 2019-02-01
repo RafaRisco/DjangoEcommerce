@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content%}
+    <div class='row mb-3'>
+
+      <!-- Esto se puede hacer (incluir como información en el template directamente
+      información que proviene del objeto request, y no hacerlo pasar como context
+      del template) porque en settings, django tiene definido que se pasa información
+      a los templates tanto desde el objeto request, como desde el objeto auth como
+      messages. La otra opción, sería en la view, override el method get_context_data
+      e incluir query en el context (primero se haría context = super()..... y después
+      context['query'] = request.GET.get('q')) -->
+      {% if request.GET.q %}
+      <div class='col-12'>
+        Results for <b>{{ request.GET.q }}</b>
+        <hr/>
+      </div>
+      {% else %}
+
+      <div class='col-12 col-md-6 mx-auto py-5'>
+        {% include 'search/snippets/search_form.html' %}
+      </div>
+      <div class='col-12'>
+        <hr/>
+      </div>
+
+      {% endif %}
+
+  {% for object in object_list %}
+    <div class='col'>
+    {% include 'products/snippets/card.html' with instance=object %}
+    {% if forloop.counter|divisibleby:3 %}
+    </div> </div> <div class='row'><div class='col-12'><hr/></div>
+    {% elif forloop.counter|divisibleby:2 %}
+    </div> </div> <div class='row'><div class='col-12'><hr/></div>
+    {% else %}
+    </div>
+    {% endif %}
+
+  {% endfor %}
+  </div>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+<!-- este es el se logean los usuarios, a través de la página login, no de la página checkout  -->
+
+
+{% block content %}
+{{ request.user }}
+
+<div class="row">
+  <div class="col-12">
+    <h1>Account</h1>
+    <hr/>
+  </div>
+  <div class="col-12 col-md-3 my-3">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Support</h5>
+          <div class="list-group">
+            <a class="list-group-item" href='{% url "about" %}'>About</a>
+            <a class="list-group-item" href='{% url "contact" %}'>Contact</a>
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-3 my-3">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Billing</h5>
+        <div class="list-group">
+          <a class="list-group-item" href='#'>Orders</a>
+          <a class="list-group-item" href='{% url "billing-payment-method" %}'>Payment Method</a>
+          <a class="list-group-item" href='#'>Addresses</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-3 my-3">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Account Details</h5>
+        <div class="list-group">
+          <a class="list-group-item" href='{% url "account:user-update" %}'>Update Details</a>
+          <a class="list-group-item" href='{% url "password_change" %}'>Change Password</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-3 my-3">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Preferences</h5>
+        <div class="list-group">
+            <a class="list-group-item" href='{% url "marketing-pref" %}'>Email marketing</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-3 my-3">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">History</h5>
+          <div class="list-group">
+            <a class="list-group-item" href='{% url "account:user-product-history" %}'>Products</a>
+          </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+{% endblock %}

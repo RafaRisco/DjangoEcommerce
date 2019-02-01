@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Cart</h1>
+
+{% if cart.products.exists %}
+<!-- En este template, lo que incluímos como context es cart. Como este tiene (o no) unos productos,
+podemos incluir en el template la información de los productos del cart (si existen) -->
+
+<table class="table cart-table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Product Name</th>
+      <th scope="col">Product Price</th>
+    </tr>
+  </thead>
+  <tbody class='cart-body'>
+    {% for product in cart.products.all %}
+    <tr class='cart-product'>
+      <th scope="row">{{ forloop.counter }}</th>
+      <!-- forloop.counte va indicando los números para cada producto del cart en orden creciente (1, 2, 3, ...) -->
+      <td>
+        <a href='{{ product.get_absolute_url }}'>{{ product.title }}</a>
+        <!-- incluímos la url a cada producto que aparece en el cart -->
+        <small>
+          {% include 'carts/snippets/remove-product.html' with product_id=product.id  %}
+          <!-- incluímos el formulario del template update-cart.html, para dar la opción de eliminar los elementos del cart,
+          puesto que en update-cart.html se activará la opción correspondiente a un producto que esta en el cart -->
+
+        </small>
+      </td>
+      <td>{{ product.price }}</td>
+      <!-- incluímos, el valor del productop para cada producto -->
+    </tr>
+    {% endfor %}
+    <tr>
+      <td colspan="2"></td>
+      <td><b>Subtotal</b> $<span class='cart-subtotal'> {{ cart.subtotal }} </span></td>
+      <!-- incluímos, el valor subtotal del cart -->
+    </tr>
+    <tr>
+      <td colspan="2"></td>
+      <td><b>Total</b> $<span class='cart-total'>{{ cart.total }}</span></td>
+      <!-- incluímos, el valor total del cart -->
+    </tr>
+    <tr>
+      <td colspan="2"></td>
+      <td>
+        <a class='btn btn-lg btn-success' href='{% url "cart:checkout" %}'>
+          <!-- esto es un botón para hacer el checkout -->
+          Checkout
+        </a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+<!-- esto lo incluímos para poder incluir ajas. Incluímos la class cart-item-remove-form. También indicamos que esté oculto, con display:none (eso es css)
+Incluímos el template carts/snippets/remove-product.html. La idea es que aparezca la opción de eliminar un producto del cart, pero que esté oculta, y que solamente
+se muestre con ajax  -->
+<div class='cart-item-remove-form' style='display:none'>
+  {% include 'carts/snippets/remove-product.html' %}
+</div>
+
+{% else %}
+
+<p class='lead'>Cart is Empty</p>
+
+{% endif %}
+
+{% endblock %}

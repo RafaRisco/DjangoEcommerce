@@ -1,0 +1,20 @@
+<!-- este es el formulario con el que se loguen los usuarios registrados o los invitados a través de la página checkout -->
+
+<form method='POST' action='{% if action_url %}{{ action_url }}{% else %}{% url "login" %}{% endif %}'>
+  <!-- arriba lo que hacemos es definir distintos tipos de action en el formulario (es decir, url a la que se redirige el formulario, que
+  llama a su vez a una view diferente para procesar el formulario. Esta es una redirección para procesar el formulario, la redirección
+  definitiva es después de procesar el formulario).
+  El template checkout.html, pasa la información a este template.
+  Si es un usuario invitado, en ese caso está definida una URL, a través de action_url, para llamar a la URL guest_register, que a su vez
+  llama a la view guest_register.
+  Si es un formulario de loguear un usuario, no hay una action url, se llamma a la url login, que llama a la view login_page-->
+
+    {% csrf_token %}
+    {% if next_url %}
+    <input type="hidden" name="next" value="{{ next_url }}">
+    <!-- next_url, es algo que el template checkout.html, le pasa a este template, y es la página a la que redirigir
+    una vez que el formulario es procesado (en alguna de las dos views guest_register o login_page)-->
+    {% endif %}
+  {{ form }}
+  <button type='submit' class='btn-default'>Submit</button>
+</form>

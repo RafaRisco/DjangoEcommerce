@@ -1,0 +1,148 @@
+<!-- Una vez que la persona selecciona hacer checkout, este es el template que aparece. Este template aparece varias veces, porque todo el proceso de checkout se hace
+desde este template. Pero lo que va mostrando el template va variando a medidas que las personas van introduciendo datos (eso lo verifica el template) a medida que avanzan
+en el proceso de checkout -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- en este caso, el elemento del context object es una order -->
+
+{% if not billing_profile %}
+
+<!-- El primer paso en el proceso de checkout, es que haya un billing_profile, lo cual incluye tener una billing_address. la view checkout_home,
+define si hay un billing_profile o no. Si no hay billing_profile es que o el usuario no está logeado o que
+el usuario invitado no está logueado. En ese caso, lo que hacemos es mostrar dos formularios, uno para que el usuario se loguee o el
+usuario invitado, incluya su email. En cualquiera de los casos (usuario o usuario invitado), la página que aparece al completar cualquiera
+de los dos formularios es la misma, es decir checkout. Esto se hace con request.build_absolute_uri -->
+
+<div class='row text-center'>
+  <div class='col-12 col-md-6'>
+    <p class='lead'>Login</p>
+    {% include 'accounts/snippets/form.html' with form=login_form next_url=request.build_absolute_uri %}
+    <!-- incluímos el formulario para que la persona se loguee. Esto lo sabemos porque el formulario que vamos a usar es login_form.
+    next_url emplea request.build_absolute_uri, para definir el atributo next en request.session next, que será la url checkout, porque
+    es la url desde la que se llama a request.build_absolute_uri. ES DECIR, SE DEFINE QUE AL COMPLETAR EL FORMUALARIO, SE VUELVE A LA URL CART:CHECKOUT, QUE
+    VUELVE A LLAMAR A LA VIEW CHECKOUT_HOME, Y QUE VUELVE A CARGAR ESTE TEMPLATE. En ese momento, ya habría un billing_profile (porque con el formulario se
+    loguea un usuario y este pasa a estar dentro de request, y al volver a cargar esta página, se crea el billing_profile usando ese user) y entonces pasaría
+    a la siguiente parte del checkout, que es shipping_address-->
+  </div>
+  <div class='col-12 col-md-6'>
+    Continue as guest
+    {% url "guest_register" as guest_register_url %}
+    {% include 'accounts/snippets/form.html' with form=guest_form next_url=request.build_absolute_uri action_url=guest_register_url %}
+    <!-- incluímos el formulario para que el usuario invitado, incluya su mail. Esto lo sabemos porque el formulario que vamos a usar es guest_form.
+    next_url emplea request.build_absolute_uri, para definir el atributo next en request.session next, que será la url checkout, porque
+    es la url desde la que se llama a request.build_absolute_uri. ES DECIR, SE DEFINE QUE AL COMPLETAR EL FORMUALARIO, SE VUELVE A LA URL CART:CHECKOUT, QUE
+    VUELVE A LLAMAR A LA VIEW CHECKOUT_HOME, Y QUE VUELVE A CARGAR ESTE TEMPLATE. En ese momento, ya habría un billing_profile (porque se crea con este formulario, al
+    loguearse el usuario) y entonces pasaría a la siguiente parte del checkout, que es shipping_address
+    action_url, sirve para indicar al formulario que está en accounts/snippets/form.html, que url tiene que llamar al ser enviado. Eso se hace con action. En este caso
+    tiene que llamar la url con el name guest_register_url, que llama a la view guest_register, dentro de accounts, y que pasa la información a request del guest email,
+    y esa informacipon de request, se pasa a la view, checkout_home, que emplea el method creado en el model BillingProfile (en su model manager, es un method nuevo), y
+    de esta forma, cuando este template es vuelvo a cargar (cuando se completa el formulario gueht_forms, la next_url indica que hay que vovler a cargar la url checkout_home,
+    que a su vez llama a la view checkout_home, que llama a este template) pues ya se hace con un billing_profile y por lo tanto, directamente se carga este template pero ya
+    en el siguiente paso-->
+
+  </div>
+</div>
+
+{% else %}
+
+<!-- con una billing_address se pasa al siguiente punto, que es una shipping_address -->
+
+  {% if not object.shipping_address %}
+
+<!-- lo primero es la shipping_address (y después la billing_address) -->
+
+  <div class='row'>
+      <div class='col-12'>
+        <p class='lead'>Shipping Address</p>
+        <hr/>
+      </div>
+        <div class='col-6'>
+
+
+            {% url "checkout_address_create" as checkout_address_create %}
+            {% include 'addresses/form.html' with form=address_form next_url=request.build_absolute_uri action_url=checkout_address_create address_type='shipping' %}
+            <!-- este es el formulario para incluir la shipping_address. Lo que hace este formulario, es que incluye el template addresses/form.html, y le pasa como
+            form, el address_form, que es parte del context que pasa la view checkout_home, y que es una instancia del form AddressForm de la app address. Además, al
+            template addresses/form.html, se le pasa como información el action_url, que será la url que llamará el form al hacer submit, y que en este caso es checkout_address_create,
+            y que lo que hace es llamar a la view que crea la shipping_address, que es la view checkout_address_create_view, de la app addresses. Esa view, toma la información
+            del template addresses/form.html, y crea la address.
+            También pasa como argumento el address_type, para que quede claro que esta es la shipping_address
+            Además, el form, tiene que volver a mndar a la url con el name checkout, que llama a la vista checkout_home, que a su vez vuelve a cargar este template, pero
+            ya con una shipping_address, por lo que el usuario puede seguir al próximo paso del proceso de checkout-->
+
+
+        </div>
+
+        <div class='col-6'>
+            {% url 'checkout_address_reuse' as checkout_address_reuse %}
+            {% include 'addresses/prev_addresses.html' with address_qs=address_qs next_url=request.build_absolute_uri address_type='shipping' action_url=checkout_address_reuse %}
+            <!-- este es el formulario para incluir la shipping_address, pero empleando alguna address ya vinculada al billing_profile existente. Lo que hace este formulario,
+            es que incluye el template addresses/prev_addresses.html. En este caso no se pasa una instancia de un formulario, sino que el template addresses/prev_addresses.html tiene
+            un formulario, que incluye diferentes addresses. Esas addresses son las que se pasa al template addresses/prev_addresses.html mediante address_qs, que son las addresses
+            vinculadas al billing_profile (esto se hace en la view checkout_home).
+            Además, al template addresses/prev_addresses.html, se le pasa como información el action_url, que será la url que llamará el form al hacer submit, y que en este caso es checkout_address_reuse,
+            y que lo que hace es llamar a la view que vincula la address existente a la shipping_address, que es la view checkout_address_reuse_view, de la app addresses. Esa view, toma la información
+            del template addresses/prev_addresses.html, localiza la address selecionada y la vincula al billing_profile. También pasa como argumento el address_type. Además, el form, tiene que volver
+            a mndar a la url con el name checkout, que llama a la vista checkout_home, que a su vez vuelve a cargar este template, pero ya con una shipping_address, por lo que el usuario puede seguir
+            al próximo paso del proceso de checkout-->
+        </div>
+  </div>
+
+
+  {% elif not object.billing_address %}
+  <!-- Ya con shipping_address address, se pasa a incluir la billing_address -->
+
+  <div class='row'>
+    <div class='col-12'>
+      <p class='lead'>Billing Address</p>
+      <hr/>
+    </div>
+      <div class='col-6'>
+
+      {% url "checkout_address_create" as checkout_address_create %}
+      {% include 'addresses/form.html' with form=address_form next_url=request.build_absolute_uri action_url=checkout_address_create address_type='billing' %}
+      <!-- Exactamente igual que antes, pero con la billing_address. En este caso se crea la billing_address. De nuveo, mediante next_url, se vuelve a mandar al usuario
+      a la url checkout, que llama a la view checkout_home, y que vuelve a cargar este template, pero ya con ouna billing_address-->
+
+    </div>
+
+    <div class='col-6'>
+      {% url 'checkout_address_reuse' as checkout_address_reuse %}
+      {% include 'addresses/prev_addresses.html' with address_qs=address_qs next_url=request.build_absolute_uri address_type='billing' action_url=checkout_address_reuse %}
+      <!-- Exactamente igual que antes, pero con la billing_address. En este caso se selecciona una billing_address ya existente. De nuveo, mediante next_url, se vuelve a mandar al usuario
+      a la url checkout, que llama a la view checkout_home, y que vuelve a cargar este template, pero ya con ouna billing_address-->
+    </div>
+
+  </div>
+
+<!-- Finalmente con billing_profile, shipping_address y billing_address, se llega a la página final de checkout, donde se muestra la información de la compra, y la
+shipping_address y billing_address-->
+
+  {% else %}
+    {% if not has_card %}
+
+    <div class='stripe-payment-form' data-token='{{ publish_key }}'
+    data-next-url='{{ request.build_absolute_uri }}' data-btn-title='Add Payment Method'></div>
+
+
+    {% else %}
+      <h1>Finalize Checkout</h1>
+      <p>Cart Items: {% for product in object.cart.products.all %} {{ product}} {% if not forloop.last %}, {% endif %}{% endfor %}</p>
+      <p>Shipping Address: {{ object.shipping_address.get_address }}</p>
+      <p>Billing Address: {{ object.billing_address.get_address }}</p>
+      <p>Payment Method: {{ billing_profile.default_card }} <a href="{{ billing_profile.get_payment_method_url }}?next={{ request.build_absolute_uri }}">Change</a></p> 
+      <p>Cart Total: {{ object.cart.total }}
+      <p>Shipping Total: {{ object.shipping_total }}</p>
+      <p>Order Total: {{ object.total }}</p>
+      <form class='form' method='POST' action="">{% csrf_token %}
+        <!-- este es el botón/formulario, para que una vez que se llega al final del proceso de checkout, el usuario confirme. En este caso, no se define el campo
+        action, porque la view checkout_home, ya tiene definido el caso en el que el method sea POST (y este es el único caso que gestiona directamente la view checkout_home)-->
+        <button type='submit' class='btn btn-success'>Checkout</button>
+      </form>
+    {% endif %}
+  {% endif %}
+{% endif %}
+
+{% endblock %}
