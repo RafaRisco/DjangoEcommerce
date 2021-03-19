@@ -11,7 +11,7 @@ django-debug-toolbar==1.11
 django-registration==3.0
 django-registration-redux==2.5
 django-storages==1.7.1
-djangorestframework==3.9.1
+djangorestframework==3.11.2
 docutils==0.14
 gunicorn==19.9.0
 idna==2.8
