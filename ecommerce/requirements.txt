@@ -8,7 +8,7 @@ dj-database-url==0.5.0
 Django==2.1.5
 django-crispy-forms==1.7.2
 django-debug-toolbar==1.11
-django-registration==3.0
+django-registration==3.1.2
 django-registration-redux==2.5
 django-storages==1.7.1
 djangorestframework==3.9.1
