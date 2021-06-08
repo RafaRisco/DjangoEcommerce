@@ -17,7 +17,7 @@ gunicorn==19.9.0
 idna==2.8
 jmespath==0.9.3
 markdown2==2.3.7
-Pillow==5.4.1
+Pillow==8.2.0
 psycopg2==2.7.6.1
 python-dateutil==2.7.5
 pytz==2018.9
